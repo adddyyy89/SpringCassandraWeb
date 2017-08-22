@@ -3,16 +3,21 @@ package com.web.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.web.cassandra.service.ICredentialService;
 import com.web.model.Login;
 
 @Controller
 public class LoginController {
+	
+	@Autowired
+	ICredentialService credentialService;
 
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public ModelAndView showLogin(HttpServletRequest request, HttpServletResponse response) {
@@ -25,10 +30,8 @@ public class LoginController {
 	public ModelAndView loginProcess(HttpServletRequest request, HttpServletResponse response,
 			@ModelAttribute("login") Login login) {
 		ModelAndView mav = null;
-		boolean validUser = false;
-		if(login.getUsername().equals("admin") && login.getPassword().equals("admin@1234")){
-			validUser = true;
-		}
+		boolean validUser = credentialService.isValid(login	.getUsername(), login.getPassword());
+		
 		if (validUser) {
 			mav = new ModelAndView("welcome");
 			mav.addObject("firstname", "UserName");
